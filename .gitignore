@@ -1,4 +1,5 @@
 *.ali
 *.o
 final
-test.txt
+bundle.tar.gz
+bundle.zip

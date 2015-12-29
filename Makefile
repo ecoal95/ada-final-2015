@@ -1,14 +1,19 @@
+BUNDLE_NAME := bundle
+
 .PHONY: all
 all: final
 	@echo > /dev/null
 
-final: nuclear_central.o
-
 .PHONY: test
 test:
-	timeout 15 ./final > test.txt || true
-	[ $$(cat test.txt | grep 'ESTABLE\|PELIGRO' | wc -l) -eq 50 ] || (echo "Failure!" && false)
-	@echo "Ok!"
+	bash test.sh 15 50 --no-prompt
+
+final: nuclear_central.o
+
+.PHONY: bundle
+bundle:
+	git archive HEAD . -o $(BUNDLE_NAME).tar.gz
+	git archive HEAD . -o $(BUNDLE_NAME).zip
 
 %.o: %.adb %.ads
 	gnatmake -gnatwa $<
@@ -19,9 +24,14 @@ test:
 %: %.adb
 	gnatmake -gnatwa $<
 
+.PHONY: clean-bundle
+clean-bundle:
+	$(RM) $(BUNDLE_NAME).tar.gz
+
+.PHONY: clean-ada-files
 clean-ada-files:
 	find . -type f -name '*.o' -delete
 	find . -type f -name '*.ali' -delete
 
-clean: clean-ada-files
+clean: clean-ada-files clean-bundle
 	rm -f final
