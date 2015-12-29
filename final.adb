@@ -5,8 +5,6 @@ with Nuclear_Central;
 
 procedure Final is
   -- Some shared constants here
-  CENTRAL_MAX_PRODUCTION: constant Integer := 30;
-  CENTRAL_MIN_PRODUCTION: constant Integer := 0;
   CITY_MAX_REQUIREMENTS: constant Integer := 90;
   CITY_MIN_REQUIREMENTS: constant Integer := 15;
 
@@ -25,12 +23,13 @@ procedure Final is
     subtype RngRange is Integer range -3..3;
     package Random is new Ada.Numerics.Discrete_Random(RngRange);
     seed: Random.Generator;
-    current_operation: Ada.Real_Time.Time;
+    current_operation: Time;
     current_requirements: Integer;
+    UPDATE_INTERVAL: constant Time_Span := Seconds(1);
   begin
     Random.reset(seed);
 
-    current_operation := Ada.Real_Time.Clock;
+    current_operation := Clock;
     loop
       current_requirements := requirements;
       current_requirements := current_requirements + Random.random(seed);
@@ -41,7 +40,7 @@ procedure Final is
         current_requirements := CITY_MIN_REQUIREMENTS;
       end if;
       requirements := current_requirements;
-      current_operation := current_operation + Ada.Real_Time.Seconds(1);
+      current_operation := current_operation + UPDATE_INTERVAL;
       delay until current_operation;
     end loop;
   end CityUpdater;
@@ -60,10 +59,12 @@ procedure Final is
   production: Integer;
   expected_production: Integer;
 
-  current_operation: Ada.Real_Time.Time;
+  current_operation: Time;
   ratio: Float;
+
+  UPDATE_INTERVAL: constant Time_Span := MilliSeconds(300);
 begin
-  current_operation := Ada.Real_Time.Clock;
+  current_operation := Clock;
 
   for i in centrals'Range loop
     centrals(i).start;
@@ -99,12 +100,17 @@ begin
       centrals_used(i) := false;
     end loop;
 
+    for i in current_values'Range loop
+      Ada.Text_IO.Put(current_values(i)'Img & ",");
+    end loop;
+    Ada.Text_IO.Put_Line("");
+
     -- TODO: This could probably be more efficient (and elegant) with a sorted
     -- dequeue, but doing that deserves a big time investment so...
     expected_production := production;
     for i in current_values'Range loop
       if expected_production < city_requirements then
-        min_value := CENTRAL_MAX_PRODUCTION;
+        min_value := Nuclear_Central.MAX_PRODUCTION;
         min_value_index := -1;
         for j in current_values'Range loop
           if current_values(j) <= min_value and centrals_used(j) = false then
@@ -122,7 +128,7 @@ begin
           Ada.Text_IO.Put_Line("Central to increment not found. This is an error.");
         end if;
       elsif expected_production > city_requirements then
-        max_value := CENTRAL_MIN_PRODUCTION;
+        max_value := Nuclear_Central.MIN_PRODUCTION;
         max_value_index := -1;
 
         for j in current_values'Range loop
@@ -149,7 +155,7 @@ begin
       end if;
     end loop;
 
-    current_operation := current_operation + Ada.Real_Time.Milliseconds(300);
+    current_operation := current_operation + UPDATE_INTERVAL;
     delay until current_operation;
   end loop;
 end Final;
