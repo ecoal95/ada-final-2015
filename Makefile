@@ -9,6 +9,11 @@ all:
 test:
 	bash test.sh 15 50 --no-prompt
 
+.PHONY: test-long
+test-long: test
+	bash test.sh 30 100 --no-prompt
+	bash test.sh 60 200 --no-prompt
+
 .PHONY: bundle
 bundle:
 	git archive HEAD . -o $(BUNDLE_NAME).tar.gz
