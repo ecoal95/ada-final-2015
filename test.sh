@@ -8,10 +8,12 @@ if [ $# -lt 2 ]; then
 fi
 
 ensure_numeric() {
-  case "$1" in
-    [0-9][0-9]*) return 0;;
-    *) echo "$0: Expected numeric argument, found $1"; exit 1 ;;
-  esac
+  if [ "$1" -eq "$1" ] 2>/dev/null; then
+    return 0
+  else
+    echo "$0: Expected numeric argument, found $1";
+    exit 1
+  fi
 }
 
 ensure_numeric "$1"
@@ -47,7 +49,7 @@ if [ $no_prompt -eq 0 ]; then
   echo "$0: Do you want the file to be removed? [Y/n]"
   read -p "$0: " option
   case "$option" in
-    Y|y) rm "$file" ;;
-    *) ;;
+    n|N) ;;
+    *) rm "$file" ;;
   esac
 fi
