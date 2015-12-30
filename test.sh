@@ -1,6 +1,6 @@
 #!/bin/bash
 
-EXECUTABLE=./final
+EXECUTABLE=./obj/final
 
 if [ $# -lt 2 ]; then
   echo "Usage: $0 seconds expected_iterations [--no-prompt]"
