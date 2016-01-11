@@ -9,17 +9,17 @@ procedure Final is
   CITY_MIN_REQUIREMENTS: constant Integer := 15;
 
   -- This is the atomic var used to update the city requirements:
-  -- The `CityUpdater` task sets it, and the main task reads it.
+  -- The `City_Updater` task sets it, and the main task reads it.
   requirements: Integer := 35;
   pragma Volatile(requirements);
   pragma Atomic(requirements);
 
-  -- The `CityUpdater` task represents a city, and updates the requirements
+  -- The `City_Updater` task represents a city, and updates the requirements
   -- once per second.
-  task type CityUpdater is
-  end CityUpdater;
+  task type City_Updater is
+  end City_Updater;
 
-  task body CityUpdater is
+  task body City_Updater is
     subtype RngRange is Integer range -3..3;
     package Random is new Ada.Numerics.Discrete_Random(RngRange);
     seed: Random.Generator;
@@ -43,12 +43,12 @@ procedure Final is
       current_operation := current_operation + UPDATE_INTERVAL;
       delay until current_operation;
     end loop;
-  end CityUpdater;
+  end City_Updater;
 
   centrals: Array(1..3) of Nuclear_Central.Nuclear_Central;
   centrals_used: Array(1..3) of Boolean;
   current_values: Array(1..3) of Integer;
-  city: CityUpdater;
+  city: City_Updater;
   city_requirements: Integer;
 
   min_value: Integer;
