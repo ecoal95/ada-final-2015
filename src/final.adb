@@ -100,10 +100,10 @@ begin
       centrals_used(i) := false;
     end loop;
 
-    for i in current_values'Range loop
-      Ada.Text_IO.Put(current_values(i)'Img & ",");
-    end loop;
-    Ada.Text_IO.Put_Line("");
+    -- for i in current_values'Range loop
+    --   Ada.Text_IO.Put(current_values(i)'Img & ",");
+    -- end loop;
+    -- Ada.Text_IO.Put_Line("");
 
     -- TODO: This could probably be more efficient (and elegant) with a sorted
     -- dequeue, but doing that deserves a big time investment so...
